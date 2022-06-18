@@ -9,6 +9,7 @@ const instance = axios.create({
 
 export async function HTTP_GET(url, params = {}) {
     try {
+        if(params) { params = { params } }
         const res = await instance.get(url, params)
         return res.data
     } catch(e) {
