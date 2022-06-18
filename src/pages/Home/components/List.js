@@ -6,10 +6,10 @@ import ListItemButton from '@mui/material/ListItemButton';
 // import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 
-const PatientList = ({ patientList }) => {
+const PatientList = ({ patientList, handleListClick }) => {
 
-    function handleClick() {
-        console.log('hi')
+    function itemClick(patientInfo) {
+        handleListClick(patientInfo)
     }
 
     return (
@@ -21,7 +21,7 @@ const PatientList = ({ patientList }) => {
                         {patientList.length > 0
                           ? patientList.map(item => (
                             <ListItem disablePadding key={item._id}>
-                                <ListItemButton onClick={() => handleClick(item._id)}>
+                                <ListItemButton onClick={() => itemClick({ patientId: item._id, name: item.name })}>
                                     <ListItemText primary={item.name} />
                                 </ListItemButton>
                             </ListItem>
