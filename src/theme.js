@@ -8,7 +8,8 @@ const theme = createTheme({
       secondary: {
         main: '#19857b',
       },
-      list: '#f5ebe0'
+      list: '#f5ebe0',
+      card: '#fefae0'
     },
 });
 
