@@ -94,6 +94,10 @@ const Home = () => {
         deletePatientOrder({ orderId })
     }
 
+    function editOrder(params) {
+        editPatientOrder(params)
+    }
+
     useEffect(() => {
         getPatientList()
     }, [])
@@ -106,6 +110,11 @@ const Home = () => {
         return `${patientInfo.name}的醫囑`
     }, [patientInfo])
 
+    // const sortedPatientOrder = useMemo(() => {
+    //     return [...patientOrder].sort((a, b) => a.updateAt - b.updateAt)
+    // }, [patientOrder])
+
+
     return (
         <div>
             <PatientList patientList={patientList} handleListClick={handleListClick} />
@@ -116,6 +125,7 @@ const Home = () => {
                 cardList={patientOrder}
                 addOrder={handleAddOrder}
                 deleteOrder={deleteOrder}
+                editOrder={editOrder}
             />
         </div>
     )
