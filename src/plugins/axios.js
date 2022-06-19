@@ -16,3 +16,31 @@ export async function HTTP_GET(url, params = {}) {
         return Promise.reject(e)
     }
 }
+
+export async function HTTP_POST(url, params) {
+    try {
+        const res = await instance.post(url, params)
+        return res.data
+    } catch(e) {
+        return Promise.reject(e)
+    }
+}
+
+export async function HTTP_PUT(url, params) {
+    try {
+        const res = await instance.put(url, params)
+        return res.data
+    } catch(e) {
+        return Promise.reject(e)
+    }
+}
+
+export async function HTTP_DELETE(url, params = {}) {
+    try {
+        if(params) { params = { params } }
+        const res = await instance.get(url, params)
+        return res.data
+    } catch(e) {
+        return Promise.reject(e)
+    }
+}
