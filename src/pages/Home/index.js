@@ -110,10 +110,9 @@ const Home = () => {
         return `${patientInfo.name}的醫囑`
     }, [patientInfo])
 
-    // const sortedPatientOrder = useMemo(() => {
-    //     return [...patientOrder].sort((a, b) => a.updateAt - b.updateAt)
-    // }, [patientOrder])
-
+    const sortedPatientOrder = useMemo(() => {
+        return [...patientOrder].sort((a, b) => new Date(b.updateAt).getTime() - new Date(a.updateAt).getTime())
+    }, [patientOrder])
 
     return (
         <div>
@@ -122,7 +121,7 @@ const Home = () => {
                 open={open}
                 setOpen={setOpen}
                 title={dialogTitle}
-                cardList={patientOrder}
+                cardList={sortedPatientOrder}
                 addOrder={handleAddOrder}
                 deleteOrder={deleteOrder}
                 editOrder={editOrder}
