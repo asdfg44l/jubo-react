@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { HTTP_GET, HTTP_POST, HTTP_PUT } from '../../plugins/axios'
+import { HTTP_DELETE, HTTP_GET, HTTP_POST, HTTP_PUT } from '../../plugins/axios'
 import PatientList from './components/List'
 import OrderDialog from './components/OrderDialog'
 
@@ -22,13 +22,13 @@ function usePatientList() {
 }
 
 //患者醫囑 CRUD
-function usePatientOrder() {
+function usePatientOrder({ patientId }) {
     const [patientOrder, setPatientOrder] = useState([])
 
     //取得患者醫囑
-    async function getPatientOrder(params) {
+    async function getPatientOrder() {
         try {
-            const patientOrder = await HTTP_GET('/order', { patientId: params.patientId })
+            const patientOrder = await HTTP_GET('/order', { patientId })
             setPatientOrder(patientOrder)
         } catch(e) {
             console.error(e)
@@ -38,7 +38,7 @@ function usePatientOrder() {
     //新增醫囑
     async function addPatientOrder(params) {
         try {
-            const { patientId, message } = params
+            const { message } = params
             await HTTP_POST('/order', { patientId, message })
             getPatientOrder()
         } catch(e) {
@@ -60,7 +60,7 @@ function usePatientOrder() {
     //刪除醫囑
     async function deletePatientOrder(params) {
         try {
-            await HTTP_GET('/order', { orderId: params.orderId })
+            await HTTP_DELETE('/order', { orderId: params.orderId })
             getPatientOrder()
         } catch(e) {
             console.error(e)
@@ -72,16 +72,26 @@ function usePatientOrder() {
 
 
 const Home = () => {
-    const [patientList, getPatientList] = usePatientList()
-    const [patientOrder, getPatientOrder, addPatientOrder, editPatientOrder, deletePatientOrder] = usePatientOrder()
     const [open, setOpen] = useState(false)
     const [patientInfo, setPatientInfo] = useState({})
+    const [patientList, getPatientList] = usePatientList()
+    const [patientOrder, getPatientOrder, addPatientOrder, editPatientOrder, deletePatientOrder] = usePatientOrder(patientInfo)
     
-
+    
+    //event handler
     function handleListClick(patientInfo) {
         //after get order
         setOpen(true)
         setPatientInfo(patientInfo)
+    }
+
+    function handleAddOrder(message) {
+        const { patientId } = patientInfo
+        addPatientOrder({ message, patientId })
+    }
+
+    function deleteOrder(orderId) {
+        deletePatientOrder({ orderId })
     }
 
     useEffect(() => {
@@ -89,7 +99,7 @@ const Home = () => {
     }, [])
 
     useEffect(() => {
-        getPatientOrder(patientInfo)
+        getPatientOrder()
     }, [patientInfo])
 
     const dialogTitle = useMemo(() => {
@@ -99,7 +109,14 @@ const Home = () => {
     return (
         <div>
             <PatientList patientList={patientList} handleListClick={handleListClick} />
-            <OrderDialog open={open} setOpen={setOpen} title={dialogTitle} cardList={patientOrder}/>
+            <OrderDialog 
+                open={open}
+                setOpen={setOpen}
+                title={dialogTitle}
+                cardList={patientOrder}
+                addOrder={handleAddOrder}
+                deleteOrder={deleteOrder}
+            />
         </div>
     )
 }
