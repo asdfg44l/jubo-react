@@ -38,7 +38,7 @@ export async function HTTP_PUT(url, params) {
 export async function HTTP_DELETE(url, params = {}) {
     try {
         if(params) { params = { params } }
-        const res = await instance.get(url, params)
+        const res = await instance.delete(url, params)
         return res.data
     } catch(e) {
         return Promise.reject(e)
