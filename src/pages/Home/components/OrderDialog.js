@@ -29,6 +29,40 @@ function dateFormat(date) {
   return newDate
 }
 
+const EditInput = ({ message, setter, handleClickButton }) => {
+  return (
+    <>
+      <TextareaAutosize
+        style={{ display: 'block', width: '100%', marginBottom: '.75rem' }}
+        aria-label="edit new doctor's order"
+        minRows={3}
+        maxRows={7}
+        value={message}
+        onChange={(e) => setter(e.target.value)}
+      />
+      <Stack direction="row" justifyContent="flex-end">
+        <Button sx={{ marginLeft: 'auto' }} onClick={handleClickButton} variant="contained">送出</Button>
+      </Stack>
+    </>
+  )
+}
+const AddInput = ({ message, setter, handleClickButton }) => {
+  return (
+    <>
+      <TextareaAutosize
+        style={{ display: 'block', width: '100%', margin: '0.5rem 1rem' }}
+        aria-label="add new doctor's order"
+        minRows={3}
+        maxRows={7}
+        placeholder="新增醫囑"
+        value={message}
+        onChange={(e) => setter(e.target.value)}
+      />
+      <Button onClick={handleClickButton} variant="contained">新增</Button>
+    </>
+  )
+}
+
 const OrderCard = ({ content, onDelete, onEdit }) => {
   const [isEdit, setIsEdit] = useState(false)
   const [editMessage, setEditMessage] = useState(content.message)
@@ -38,23 +72,7 @@ const OrderCard = ({ content, onDelete, onEdit }) => {
     setIsEdit(false)
   }
 
-  const EditInput = () => {
-    return (
-      <>
-        <TextareaAutosize
-          style={{ fontSize: '16px', display: 'block', width: '100%', marginBottom: '.75rem' }}
-          aria-label="edit new doctor's order"
-          minRows={3}
-          maxRows={7}
-          value={editMessage}
-          onChange={(e) => setEditMessage(e.target.value)}
-        />
-        <Stack direction="row" justifyContent="flex-end">
-          <Button sx={{ marginLeft: 'auto' }} onClick={handleEditCard} variant="contained">送出</Button>
-        </Stack>
-      </>
-    )
-  }
+  
 
   return (
     <Card sx={{ marginBottom: '1rem', backgroundColor: 'card', position: 'relative' }}>
@@ -63,10 +81,10 @@ const OrderCard = ({ content, onDelete, onEdit }) => {
       </IconButton>
       <CardContent>
         <Typography sx={{ fontSize: 12 }} color="text.secondary" gutterBottom>
-          創建日期: {dateFormat(content.createAt)}
+          更新日期: {dateFormat(content.updateAt)}
         </Typography>
         <Typography sx={{ fontSize: 12 }} color="text.secondary" gutterBottom>
-          更新日期: {dateFormat(content.updateAt)}
+          創建日期: {dateFormat(content.createAt)}
         </Typography>
         <Stack direction="row" alignItems="center">
           <Typography sx={{ fontSize: 16 }} variant="body2">
@@ -79,7 +97,7 @@ const OrderCard = ({ content, onDelete, onEdit }) => {
         <Typography sx={{ fontSize: 14 }} component="div">
           {!isEdit
             ? content.message
-            : <EditInput />
+            : <EditInput message={editMessage} setter={setEditMessage} handleClickButton={handleEditCard}/>
           }
           
         </Typography>
@@ -111,18 +129,10 @@ const OrderDialog = ({ open, setOpen, title, cardList, addOrder, deleteOrder, ed
           {title}
         </DialogTitle>
         <DialogContent sx={{ display: 'flex', alignItems: 'center' }}>
-          <TextareaAutosize
-            style={{ display: 'block', width: '100%', margin: '0.5rem 1rem' }}
-            aria-label="add new doctor's order"
-            minRows={3}
-            maxRows={7}
-            placeholder="新增醫囑"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          />
-          <Button onClick={handleAddOrder} variant="contained">新增</Button>
+          <AddInput message={message} setter={setMessage} handleClickButton={handleAddOrder}/>
         </DialogContent>
         <DialogContent>
+          <Typography component="small" sx={{ color: 'red', fontSize: '12px' }}>*依更新日期排序</Typography>
           {cardList.length > 0 &&
            cardList.map(item => <OrderCard content={item} key={item._id} onDelete={handleDeleteOrder} onEdit={editOrder}/>)
           }
