@@ -32,13 +32,13 @@ function dateFormat(date) {
 }
 
 //use validate
-function useOrderValidate(text, isActivate, isSubmit) {
+function useOrderValidate(text, isSubmit) {
   // const [isSubmit, setIsSubmit] = useState(false)
   const [inValidate, setInValidate] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
 
   function handleOrderValidate() {
-    if(text.trim() === "") {
+    if(text === "") {
       setInValidate(true)
       setErrorMessage("請輸入必填資料")
       return
@@ -67,8 +67,8 @@ const OrderInput = ({ message, setter, handleClickButton, buttonTitle }) => {
 
   function handleChange(value) {
     setIsActivate(true)
-    setUserInput(value)
-    setter(value)
+    setUserInput(value.trim())
+    setter(value.trim())
   }
 
   function handleClick() {
@@ -182,7 +182,7 @@ const OrderDialog = ({ open, setOpen, title, cardList, addOrder, deleteOrder, ed
            </Box>
            : cardList.length > 0
            ? cardList.map(item => <OrderCard content={item} key={item._id} onDelete={handleDeleteOrder} onEdit={editOrder}/>)
-           : "目前沒有醫囑，請自行新增"
+           : <Typography component='p' sx={{ textAlign: 'center' }}>目前沒有醫囑，請自行新增</Typography>
           }
         </DialogContent>
         <DialogActions>
