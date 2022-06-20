@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { Dialog } from '@mui/material';
@@ -46,51 +46,47 @@ function useOrderValidate(text, isActivate, isSubmit) {
   }
 
   useEffect(() => {
-    if(!isActivate.current) {
-      isActivate.current = true
-      return
-    }
-    if(!isSubmit) return
+    // if(!isSubmit) return
     handleOrderValidate()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, isActivate, isSubmit])
+  }, [text, isSubmit])
 
   return [inValidate, errorMessage]
 }
 
 const OrderInput = ({ message, setter, handleClickButton, buttonTitle }) => {
-  const isActivateValidate = useRef(false)
-  const [userInput, setUserInput] = useState(message)
+  const [isActivate, setIsActivate] = useState(false)
+  const [userInput, setUserInput] = useState("")
   const [isSubmit, setIsSubmit] = useState(false)
-  const [inValidate, errorMessage] = useOrderValidate(userInput, isActivateValidate, isSubmit)
+  const [inValidate, errorMessage] = useOrderValidate(userInput, isSubmit)
 
   const baseStyle = { display: 'block', width: '100%', margin: '0.5rem 1rem 0.5rem 0' }
   const errorStyle = { borderColor: 'red' }
 
   function handleChange(value) {
+    setIsActivate(true)
     setUserInput(value)
     setter(value)
   }
 
   function handleClick() {
-    isActivateValidate.current = true
+    setIsActivate(true)
     setIsSubmit(true)
   }
 
   useEffect(() => {
     if(!inValidate && isSubmit) {
       handleClickButton()
-      isActivateValidate.current = false
     }
     setIsSubmit(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inValidate])
+  }, [inValidate, isSubmit])
 
   return (
     <>
       <Stack direction='row' alignItems='center'>
         <TextareaAutosize
-          style={inValidate ? {...baseStyle, ...errorStyle} : baseStyle}
+          style={inValidate && isActivate ? {...baseStyle, ...errorStyle} : baseStyle}
           aria-label="add new doctor's order"
           minRows={3}
           maxRows={7}
@@ -100,7 +96,7 @@ const OrderInput = ({ message, setter, handleClickButton, buttonTitle }) => {
         />
         <Button onClick={handleClick} variant="contained">{buttonTitle}</Button>
       </Stack>
-      {inValidate &&
+      {inValidate && isActivate &&
         <Typography sx={{ fontSize: '12px', color: 'red' }} component="small">
           {errorMessage}
         </Typography>
