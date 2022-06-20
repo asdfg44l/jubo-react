@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Button from '@mui/material/Button';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { Dialog } from '@mui/material';
@@ -29,36 +29,83 @@ function dateFormat(date) {
   return newDate
 }
 
-const EditInput = ({ message, setter, handleClickButton }) => {
-  return (
-    <>
-      <TextareaAutosize
-        style={{ display: 'block', width: '100%', marginBottom: '.75rem' }}
-        aria-label="edit new doctor's order"
-        minRows={3}
-        maxRows={7}
-        value={message}
-        onChange={(e) => setter(e.target.value)}
-      />
-      <Stack direction="row" justifyContent="flex-end">
-        <Button sx={{ marginLeft: 'auto' }} onClick={handleClickButton} variant="contained">送出</Button>
-      </Stack>
-    </>
-  )
+//use validate
+function useOrderValidate(text, isActivate, isSubmit) {
+  // const [isSubmit, setIsSubmit] = useState(false)
+  const [inValidate, setInValidate] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+
+  function handleOrderValidate() {
+    if(text.trim() === "") {
+      setInValidate(true)
+      setErrorMessage("請輸入必填資料")
+      return
+    }
+    setInValidate(false)
+    setErrorMessage("")
+  }
+
+  useEffect(() => {
+    if(!isActivate.current) {
+      isActivate.current = true
+      return
+    }
+    if(!isSubmit) return
+    handleOrderValidate()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text, isActivate, isSubmit])
+
+  return [inValidate, errorMessage]
 }
-const AddInput = ({ message, setter, handleClickButton }) => {
+
+const OrderInput = ({ message, setter, handleClickButton, buttonTitle }) => {
+  const isActivateValidate = useRef(false)
+  const [userInput, setUserInput] = useState(message)
+  const [isSubmit, setIsSubmit] = useState(false)
+  const [inValidate, errorMessage] = useOrderValidate(userInput, isActivateValidate, isSubmit)
+
+  const baseStyle = { display: 'block', width: '100%', margin: '0.5rem 1rem 0.5rem 0' }
+  const errorStyle = { borderColor: 'red' }
+
+  function handleChange(value) {
+    setUserInput(value)
+    setter(value)
+  }
+
+  function handleClick() {
+    isActivateValidate.current = true
+    setIsSubmit(true)
+  }
+
+  useEffect(() => {
+    if(!inValidate && isSubmit) {
+      handleClickButton()
+      isActivateValidate.current = false
+    }
+    setIsSubmit(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inValidate])
+
   return (
     <>
-      <TextareaAutosize
-        style={{ display: 'block', width: '100%', margin: '0.5rem 1rem' }}
-        aria-label="add new doctor's order"
-        minRows={3}
-        maxRows={7}
-        placeholder="新增醫囑"
-        value={message}
-        onChange={(e) => setter(e.target.value)}
-      />
-      <Button onClick={handleClickButton} variant="contained">新增</Button>
+      <Stack direction='row' alignItems='center'>
+        <TextareaAutosize
+          style={inValidate ? {...baseStyle, ...errorStyle} : baseStyle}
+          aria-label="add new doctor's order"
+          minRows={3}
+          maxRows={7}
+          placeholder="新增醫囑"
+          value={message}
+          onChange={(e) => handleChange(e.target.value)}
+        />
+        <Button onClick={handleClick} variant="contained">{buttonTitle}</Button>
+      </Stack>
+      {inValidate &&
+        <Typography sx={{ fontSize: '12px', color: 'red' }} component="small">
+          {errorMessage}
+        </Typography>
+      }
+      
     </>
   )
 }
@@ -71,8 +118,6 @@ const OrderCard = ({ content, onDelete, onEdit }) => {
     onEdit({ message: editMessage, orderId: content._id })
     setIsEdit(false)
   }
-
-  
 
   return (
     <Card sx={{ marginBottom: '1rem', backgroundColor: 'card', position: 'relative' }}>
@@ -97,7 +142,7 @@ const OrderCard = ({ content, onDelete, onEdit }) => {
         <Typography sx={{ fontSize: 14 }} component="div">
           {!isEdit
             ? content.message
-            : <EditInput message={editMessage} setter={setEditMessage} handleClickButton={handleEditCard}/>
+            : <OrderInput message={editMessage} setter={setEditMessage} handleClickButton={handleEditCard} buttonTitle="送出"/>
           }
           
         </Typography>
@@ -128,8 +173,8 @@ const OrderDialog = ({ open, setOpen, title, cardList, addOrder, deleteOrder, ed
         <DialogTitle>
           {title}
         </DialogTitle>
-        <DialogContent sx={{ display: 'flex', alignItems: 'center' }}>
-          <AddInput message={message} setter={setMessage} handleClickButton={handleAddOrder}/>
+        <DialogContent>
+          <OrderInput message={message} setter={setMessage} handleClickButton={handleAddOrder} buttonTitle="新增"/>
         </DialogContent>
         <DialogContent>
           <Typography component="small" sx={{ color: 'red', fontSize: '12px' }}>*依更新日期排序</Typography>
