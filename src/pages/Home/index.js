@@ -108,10 +108,12 @@ const Home = () => {
 
     useEffect(() => {
         getPatientList()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
         getPatientOrder()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [patientInfo])
 
     const dialogTitle = useMemo(() => {
