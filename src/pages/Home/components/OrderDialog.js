@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { Dialog } from '@mui/material';
@@ -147,7 +149,7 @@ const OrderCard = ({ content, onDelete, onEdit }) => {
   )
 }
 
-const OrderDialog = ({ open, setOpen, title, cardList, addOrder, deleteOrder, editOrder }) => {
+const OrderDialog = ({ open, setOpen, title, cardList, addOrder, deleteOrder, editOrder, isLoading }) => {
   const [message, setMessage] = useState("")
 
   function handleClose() {
@@ -174,8 +176,13 @@ const OrderDialog = ({ open, setOpen, title, cardList, addOrder, deleteOrder, ed
         </DialogContent>
         <DialogContent>
           <Typography component="small" sx={{ color: 'red', fontSize: '12px' }}>*依更新日期排序</Typography>
-          {cardList.length > 0 &&
-           cardList.map(item => <OrderCard content={item} key={item._id} onDelete={handleDeleteOrder} onEdit={editOrder}/>)
+          {isLoading ?
+           <Box sx={{ display: 'flex', justifyContent: 'center', padding: '0.5rem' }}>
+            <CircularProgress />
+           </Box>
+           : cardList.length > 0
+           ? cardList.map(item => <OrderCard content={item} key={item._id} onDelete={handleDeleteOrder} onEdit={editOrder}/>)
+           : "目前沒有醫囑，請自行新增"
           }
         </DialogContent>
         <DialogActions>

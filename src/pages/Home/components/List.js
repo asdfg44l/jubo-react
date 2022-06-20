@@ -5,8 +5,9 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 // import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import CircularProgress from '@mui/material/CircularProgress';
 
-const PatientList = ({ patientList, handleListClick }) => {
+const PatientList = ({ patientList, handleListClick, isLoading }) => {
 
     function itemClick(patientInfo) {
         handleListClick(patientInfo)
@@ -18,7 +19,11 @@ const PatientList = ({ patientList, handleListClick }) => {
             <Box sx={{ width: '100%', bgcolor: 'list', borderRadius: '5px' }}>
                 <nav aria-label="main mailbox folders">
                     <List>
-                        {patientList.length > 0
+                        {isLoading ?
+                          <Box sx={{ display: 'flex', justifyContent: 'center', padding: '0.5rem' }}>
+                            <CircularProgress />
+                          </Box>
+                          : patientList.length > 0
                           ? patientList.map(item => (
                             <ListItem disablePadding key={item._id}>
                                 <ListItemButton onClick={() => itemClick({ patientId: item._id, name: item.name })}>
@@ -26,7 +31,7 @@ const PatientList = ({ patientList, handleListClick }) => {
                                 </ListItemButton>
                             </ListItem>
                           ))
-                          : "No Patient Data, Please run Seeder"
+                          : <CircularProgress />
                         }
                     </List>
                 </nav>

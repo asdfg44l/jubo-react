@@ -7,31 +7,39 @@ import OrderDialog from './components/OrderDialog'
 //hook
 //取得患者列表
 function usePatientList() {
+    const [isLoading, setIsLoading] = useState(false)
     const [patientList, setPatientList] = useState([])
 
     async function getPatientList() {
         try {
+            setIsLoading(true)
             const patients = await HTTP_GET('/patient')
             setPatientList(patients)
         } catch(e) {
             console.error(e)
+        } finally {
+            setIsLoading(false)
         }
     }
 
-    return [patientList, getPatientList]
+    return [patientList, getPatientList, isLoading]
 }
 
 //患者醫囑 CRUD
 function usePatientOrder({ patientId }) {
+    const [isLoading, setIsLoading] = useState(false)
     const [patientOrder, setPatientOrder] = useState([])
 
     //取得患者醫囑
     async function getPatientOrder() {
         try {
+            setIsLoading(true)
             const patientOrder = await HTTP_GET('/order', { patientId })
             setPatientOrder(patientOrder)
         } catch(e) {
             console.error(e)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -67,15 +75,15 @@ function usePatientOrder({ patientId }) {
         }
     }
 
-    return [patientOrder, getPatientOrder, addPatientOrder, editPatientOrder, deletePatientOrder]
+    return [patientOrder, getPatientOrder, addPatientOrder, editPatientOrder, deletePatientOrder, isLoading]
 }
 
 
 const Home = () => {
     const [open, setOpen] = useState(false)
     const [patientInfo, setPatientInfo] = useState({})
-    const [patientList, getPatientList] = usePatientList()
-    const [patientOrder, getPatientOrder, addPatientOrder, editPatientOrder, deletePatientOrder] = usePatientOrder(patientInfo)
+    const [patientList, getPatientList, patientListLoading] = usePatientList()
+    const [patientOrder, getPatientOrder, addPatientOrder, editPatientOrder, deletePatientOrder, patientOrderLoading] = usePatientOrder(patientInfo)
     
     
     //event handler
@@ -116,7 +124,7 @@ const Home = () => {
 
     return (
         <div>
-            <PatientList patientList={patientList} handleListClick={handleListClick} />
+            <PatientList patientList={patientList} handleListClick={handleListClick} isLoading={patientListLoading}/>
             <OrderDialog 
                 open={open}
                 setOpen={setOpen}
@@ -125,6 +133,7 @@ const Home = () => {
                 addOrder={handleAddOrder}
                 deleteOrder={deleteOrder}
                 editOrder={editOrder}
+                isLoading={patientOrderLoading}
             />
         </div>
     )
