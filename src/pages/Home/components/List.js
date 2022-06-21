@@ -6,6 +6,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 // import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import CircularProgress from '@mui/material/CircularProgress';
+import { Typography } from '@mui/material';
 
 const PatientList = ({ patientList, handleListClick, isLoading }) => {
 
@@ -31,7 +32,7 @@ const PatientList = ({ patientList, handleListClick, isLoading }) => {
                                 </ListItemButton>
                             </ListItem>
                           ))
-                          : <CircularProgress />
+                          : <Typography sx={{ textAlign: 'center' }} component="p">伺服器休眠中，請重新整理</Typography>
                         }
                     </List>
                 </nav>
